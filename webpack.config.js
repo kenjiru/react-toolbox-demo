@@ -1,80 +1,77 @@
-var path = require('path');
+var path = require("path");
 var webpack = require("webpack");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var ProvidePlugin = webpack.ProvidePlugin;
+var HtmlWebpackPlugin = require("html-webpack-plugin");
 
-var argv = require('optimist').argv;
-
-var modules_dir = path.join(__dirname, "/node_modules");
 var src_dir = path.join(__dirname, "/src");
+const nodeEnv = process.env.NODE_ENV || "development";
 
 var config = {
-	context: __dirname,
-	entry: {
-		app: envDep(
-			[
-				'webpack-dev-server/client?http://0.0.0.0:8080',
-				'webpack/hot/dev-server',
-				src_dir + '/App.tsx'
-			],
-			src_dir + '/App.tsx'
-		)
-	},
-	output: {
-		path: path.join(__dirname, '/dist'),
-		filename: 'App.js?[hash]'
-	},
-	resolve: {
-		extensions: ['', '.ts', '.tsx', '.js']
-	},
-	module: {
-		loaders: [
-			{
-				test: /\.(tsx|ts)$/,
-				loaders: envDep(
-					['react-hot', 'ts-loader'],
-					['ts-loader']
-				),
-				include: src_dir
-			}, {
-				test: /\.less$/,
-				loader: envDep(
-					"style-loader!css-loader!less-loader",
-					ExtractTextPlugin.extract("style-loader", "css-loader!less-loader")
-				)
-			}, {
-				test: /\.css/,
-				loader: "style-loader!css-loader"
-			}, {
-				test: /\.(png|jpg|gif|eot|ttf|woff|woff2|svg)$/,
-				exclude: /public/,
-				loader: 'url-loader?limit=5000&name=[path][name].[ext]?[hash]'
-			}
-		]
-	},
-	plugins: [
-		new HtmlWebpackPlugin({
-		    title: "React TypeScript demo"
-		}),
-		new ExtractTextPlugin("[name].css?[hash]"),
-		new ProvidePlugin({
-			$: "jquery",
-			jQuery: "jquery",
-			React: "react/addons"
-		})
-	]
+    context: __dirname,
+    entry: {
+        app: src_dir + "/App.tsx"
+    },
+    output: {
+        path: path.join(__dirname, "/dist"),
+        filename: "App.js?[hash]"
+    },
+    resolve: {
+        extensions: [".ts", ".tsx", ".js"],
+        modules: [
+            path.resolve("./src"),
+            "node_modules"
+        ]
+    },
+    module: {
+        loaders: [
+            {
+                test: /\.(tsx|ts)$/,
+                loader: "ts-loader",
+                include: src_dir
+            }, {
+                test: /\.less$/,
+                loaders: ["style-loader", "css-loader", "less-loader"]
+            }, {
+                test: /\.css/,
+                loaders: ["style-loader", "css-loader"]
+            }, {
+                test: /\.(png|jpg|gif|eot|ttf|woff|woff2|svg)$/,
+                exclude: /public/,
+                loader: "url-loader",
+                query: {
+                    limit: 500,
+                    name: "[path][name].[ext]",
+                    hash: "[hash]"
+                }
+            }
+        ]
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            title: "React TypeScript demo"
+        }),
+        new ExtractTextPlugin("[name].css?[hash]"),
+        new webpack.LoaderOptionsPlugin({
+            minimize: true,
+            debug: false
+        }),
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false
+            },
+            output: {
+                comments: false
+            },
+            sourceMap: false
+        }),
+        new webpack.DefinePlugin({
+            "process.env": { NODE_ENV: JSON.stringify(nodeEnv) }
+        })
+    ],
+    devServer: {
+        contentBase: "./src",
+        hot: true
+    }
 };
 
 module.exports = config;
-
-/**
- * If running development mode, return the 'dev' argument, else return the 'prod' argument.
- */
-function envDep(dev, prod) {
-	return isDev() ? dev : prod;
-}
-
-function isDev() {
-	return !!argv.d;
-}

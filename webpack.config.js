@@ -16,7 +16,7 @@ var config = {
         filename: "App.js?[hash]"
     },
     resolve: {
-        extensions: [".ts", ".tsx", ".js"],
+        extensions: [".ts", ".tsx", ".js", ".scss", ".css"],
         modules: [
             path.resolve("./src"),
             "node_modules"
@@ -31,6 +31,15 @@ var config = {
             }, {
                 test: /\.less$/,
                 loaders: ["style-loader", "css-loader", "less-loader"]
+            }, {
+                test: /\.scss$/,
+                loader: ExtractTextPlugin.extract({
+                    fallbackLoader: "style-loader",
+                    loader: [
+                        "css?sourceMap&modules&importLoaders=1",
+                        "sass"
+                    ]
+                })
             }, {
                 test: /\.css/,
                 loaders: ["style-loader", "css-loader"]
@@ -47,6 +56,14 @@ var config = {
         ]
     },
     plugins: [
+        new webpack.LoaderOptionsPlugin({
+            minimize: true,
+            debug: false,
+            sassLoader: {
+                data: '@import "theme.config.scss";',
+                includePaths: [src_dir]
+            }
+        }),
         new HtmlWebpackPlugin({
             title: "React TypeScript demo"
         }),

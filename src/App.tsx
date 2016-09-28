@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Button } from 'react-toolbox/lib/button';
 
+import 'react-toolbox/lib/commons.scss';
 import './App.less';
 
 class App extends React.Component<any, any> {
@@ -8,7 +10,8 @@ class App extends React.Component<any, any> {
         return (
             <div>
                 <h1>App title</h1>
-                <div>App content</div>
+                <Button label="Click me!"/>
+                <Button icon='bookmark' label='Bookmark' accent />
             </div>
         );
     }

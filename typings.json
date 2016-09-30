@@ -3,5 +3,8 @@
   "globalDependencies": {
     "react": "registry:dt/react#0.14.0+20160927082313",
     "react-dom": "registry:dt/react-dom#0.14.0+20160412154040"
+  },
+  "dependencies": {
+    "lodash": "registry:npm/lodash#4.0.0+20160723033700"
   }
 }
